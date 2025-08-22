@@ -32,11 +32,19 @@ class ViewController: UIViewController, WKNavigationDelegate {
         let spacer = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let refresh = UIBarButtonItem(barButtonSystemItem: .refresh, target: webView, action: #selector(webView.reload))
 
+        // Challenge 2: back and forward buttons
+        let back = UIBarButtonItem(barButtonSystemItem: .rewind, target: webView, action: #selector(webView.goBack))
+        let forward = UIBarButtonItem(
+            barButtonSystemItem: .fastForward,
+            target: webView,
+            action: #selector(webView.goForward)
+        )
+
         progressView = UIProgressView(progressViewStyle: .default)
         progressView.sizeToFit()
         let progressButton = UIBarButtonItem(customView: progressView)
 
-        toolbarItems = [progressButton, spacer, refresh]
+        toolbarItems = [progressButton, spacer, refresh, back, forward]
         navigationController?.isToolbarHidden = false
 
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
@@ -62,6 +70,18 @@ class ViewController: UIViewController, WKNavigationDelegate {
         guard let actionTitle = action.title else { return }
         guard let url = URL(string: "https://" + actionTitle) else { return }
         webView.load(URLRequest(url: url))
+//        if websites.contains(actionTitle) {
+//
+//        } else {
+//            // Challenge 1: Blocking sites
+//            let ac = UIAlertController(
+//                title: "You are blocked from viewing this page",
+//                message: "Sorry about that.",
+//                preferredStyle: .alert
+//            )
+//            present(ac, animated: true)
+//        }
+
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -92,6 +112,15 @@ class ViewController: UIViewController, WKNavigationDelegate {
                     decisionHandler(.allow)
                     return
                 }
+            }
+            // Challenge 1: Blocking sites
+            if !websites.contains(host) {
+                let ac = UIAlertController(
+                    title: "You are blocked from viewing this page",
+                    message: "Sorry about that.",
+                    preferredStyle: .alert
+                )
+                present(ac, animated: true)
             }
         }
 
